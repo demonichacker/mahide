@@ -157,7 +157,7 @@ export const products: Product[] = [
       "Machine wash cold gentle cycle",
     ],
     featured: false,
-    availability: "in_stock",
+    availability: "coming_soon",
   },
   {
     id: "heritage-jersey-polo",
@@ -177,7 +177,7 @@ export const products: Product[] = [
       "Machine wash cold gentle cycle",
     ],
     featured: false,
-    availability: "in_stock",
+    availability: "coming_soon",
   },
 ]
 
