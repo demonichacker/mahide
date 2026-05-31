@@ -28,13 +28,28 @@ export function Footer() {
           <div className="space-y-4">
             <h4 className="font-semibold">Follow Us</h4>
             <div className="flex gap-4">
-              <button className="w-10 h-10 rounded-full bg-foreground/5 hover:bg-foreground/10 flex items-center justify-center transition-colors">
+              <button 
+                type="button"
+                aria-label="Follow us on Instagram"
+                className="w-10 h-10 rounded-full bg-foreground/5 hover:bg-foreground/10 flex items-center justify-center transition-colors"
+                onClick={() => window.open("https://instagram.com", "_blank")}
+              >
                 <Instagram className="w-5 h-5" />
               </button>
-              <button className="w-10 h-10 rounded-full bg-foreground/5 hover:bg-foreground/10 flex items-center justify-center transition-colors">
+              <button 
+                type="button"
+                aria-label="Follow us on Facebook"
+                className="w-10 h-10 rounded-full bg-foreground/5 hover:bg-foreground/10 flex items-center justify-center transition-colors"
+                onClick={() => window.open("https://facebook.com", "_blank")}
+              >
                 <Facebook className="w-5 h-5" />
               </button>
-              <button className="w-10 h-10 rounded-full bg-foreground/5 hover:bg-foreground/10 flex items-center justify-center transition-colors">
+              <button 
+                type="button"
+                aria-label="Follow us on Twitter"
+                className="w-10 h-10 rounded-full bg-foreground/5 hover:bg-foreground/10 flex items-center justify-center transition-colors"
+                onClick={() => window.open("https://twitter.com", "_blank")}
+              >
                 <Twitter className="w-5 h-5" />
               </button>
             </div>
