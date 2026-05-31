@@ -17,21 +17,8 @@ export const metadata: Metadata = {
     "Discover ultra-modern, luxury fashion at MAHIDE COLLECTION. Premium quality pieces designed for those who demand sophistication and style. Order directly via WhatsApp.",
   generator: "v0.app",
   icons: {
-    icon: [
-      {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/icon.svg",
-        type: "image/svg+xml",
-      },
-    ],
-    apple: "/apple-icon.png",
+    icon: "/logo.jpg",
+    apple: "/logo.jpg",
   },
 }
 
