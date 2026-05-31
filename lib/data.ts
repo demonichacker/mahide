@@ -72,7 +72,7 @@ export const products: Product[] = [
       "Tumble dry low",
       "Warm iron on reverse side",
     ],
-    featured: true,
+    featured: false,
     availability: "in_stock",
   },
   {
@@ -116,7 +116,7 @@ export const products: Product[] = [
       "Dry flat",
       "Machine wash cold gentle cycle",
     ],
-    featured: true,
+    featured: false,
     availability: "in_stock",
   },
   {
@@ -136,7 +136,7 @@ export const products: Product[] = [
       "Dry flat",
       "Machine wash cold gentle cycle",
     ],
-    featured: true,
+    featured: false,
     availability: "coming_soon",
   },
   {
@@ -156,7 +156,7 @@ export const products: Product[] = [
       "Dry flat",
       "Machine wash cold gentle cycle",
     ],
-    featured: true,
+    featured: false,
     availability: "in_stock",
   },
   {
@@ -176,7 +176,7 @@ export const products: Product[] = [
       "Dry flat",
       "Machine wash cold gentle cycle",
     ],
-    featured: true,
+    featured: false,
     availability: "in_stock",
   },
 ]
