@@ -7,6 +7,8 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card } from '@/components/ui/card'
+import Image from 'next/image'
+import { useToast } from '@/hooks/use-toast'
 
 interface Product {
   _id?: string
@@ -31,7 +33,9 @@ interface ProductFormProps {
 }
 
 export function ProductForm({ product, onSave, onCancel }: ProductFormProps) {
+  const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
   const [formData, setFormData] = useState<Partial<Product>>(
     product || {
       id: '',
@@ -48,6 +52,99 @@ export function ProductForm({ product, onSave, onCancel }: ProductFormProps) {
       availability: 'in_stock',
     }
   )
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setIsUploading(true)
+    try {
+      const formDataObj = new FormData()
+      formDataObj.append('file', file)
+
+      const response = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formDataObj,
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        toast({
+          title: 'Upload failed',
+          description: error.error || 'Failed to upload image',
+          variant: 'destructive',
+        })
+        return
+      }
+
+      const data = await response.json()
+      setFormData((prev) => ({ ...prev, image: data.url }))
+      toast({
+        title: 'Success',
+        description: 'Main image uploaded successfully',
+      })
+    } catch (error) {
+      console.error('Upload error:', error)
+      toast({
+        title: 'Error',
+        description: 'Failed to upload image',
+        variant: 'destructive',
+      })
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
+  const handleGalleryImagesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files) return
+
+    setIsUploading(true)
+    const uploadedUrls: string[] = [...(formData.images || [])]
+
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i]
+        const formDataObj = new FormData()
+        formDataObj.append('file', file)
+
+        const response = await fetch('/api/admin/upload', {
+          method: 'POST',
+          body: formDataObj,
+        })
+
+        if (!response.ok) {
+          const error = await response.json()
+          throw new Error(error.error || 'Failed to upload image')
+        }
+
+        const data = await response.json()
+        uploadedUrls.push(data.url)
+      }
+
+      setFormData((prev) => ({ ...prev, images: uploadedUrls }))
+      toast({
+        title: 'Success',
+        description: `${files.length} image(s) uploaded successfully`,
+      })
+    } catch (error) {
+      console.error('Upload error:', error)
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to upload images',
+        variant: 'destructive',
+      })
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
+  const removeGalleryImage = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      images: (prev.images || []).filter((_, i) => i !== index),
+    }))
+  }
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -113,26 +210,62 @@ export function ProductForm({ product, onSave, onCancel }: ProductFormProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="image">Main Image URL</Label>
-        <Input
-          id="image"
-          name="image"
-          value={formData.image || ''}
-          onChange={handleInputChange}
-          placeholder="/product.jpg"
-          required
-        />
+        <Label htmlFor="image">Main Image</Label>
+        <div className="space-y-2">
+          <Input
+            id="image"
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            disabled={isUploading}
+          />
+          {formData.image && (
+            <div className="relative w-32 h-32">
+              <Image
+                src={formData.image}
+                alt="Main product image"
+                fill
+                className="object-cover rounded"
+              />
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="images">Image URLs (comma-separated)</Label>
-        <Textarea
-          id="images"
-          value={(formData.images || []).join(', ')}
-          onChange={(e) => handleArrayInput('images', e.target.value)}
-          placeholder="/image1.jpg, /image2.jpg"
-          rows={2}
-        />
+        <Label htmlFor="images">Gallery Images (Upload multiple)</Label>
+        <div className="space-y-2">
+          <Input
+            id="images"
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleGalleryImagesUpload}
+            disabled={isUploading}
+          />
+          {formData.images && formData.images.length > 0 && (
+            <div className="grid grid-cols-4 gap-2">
+              {formData.images.map((url, index) => (
+                <div key={index} className="relative group">
+                  <Image
+                    src={url}
+                    alt={`Gallery image ${index + 1}`}
+                    width={80}
+                    height={80}
+                    className="object-cover rounded"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeGalleryImage(index)}
+                    className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 rounded flex items-center justify-center text-white text-sm transition-opacity"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="space-y-2">
@@ -232,10 +365,10 @@ export function ProductForm({ product, onSave, onCancel }: ProductFormProps) {
       </div>
 
       <div className="flex gap-2 pt-4">
-        <Button type="submit" className="flex-1" disabled={isLoading}>
-          {isLoading ? 'Saving...' : 'Save Product'}
+        <Button type="submit" className="flex-1" disabled={isLoading || isUploading}>
+          {isLoading ? 'Saving...' : isUploading ? 'Uploading...' : 'Save Product'}
         </Button>
-        <Button type="button" variant="outline" onClick={onCancel}>
+        <Button type="button" variant="outline" onClick={onCancel} disabled={isUploading}>
           Cancel
         </Button>
       </div>

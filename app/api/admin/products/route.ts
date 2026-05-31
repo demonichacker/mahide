@@ -84,8 +84,18 @@ export async function PUT(request: NextRequest) {
     }
 
     const collection = await getProductsCollection()
+    
+    // Validate ObjectId format
+    let query: any = {}
+    try {
+      query = { _id: new ObjectId(id) }
+    } catch {
+      // If invalid ObjectId, try searching by id field instead
+      query = { id: id }
+    }
+    
     const result = await collection.updateOne(
-      { _id: new ObjectId(id) },
+      query,
       {
         $set: {
           ...updateData,
@@ -133,7 +143,17 @@ export async function DELETE(request: NextRequest) {
     }
 
     const collection = await getProductsCollection()
-    const result = await collection.deleteOne({ _id: new ObjectId(id) })
+    
+    // Validate ObjectId format
+    let query: any = {}
+    try {
+      query = { _id: new ObjectId(id) }
+    } catch {
+      // If invalid ObjectId, try searching by id field instead
+      query = { id: id }
+    }
+    
+    const result = await collection.deleteOne(query)
 
     if (result.deletedCount === 0) {
       return NextResponse.json(
