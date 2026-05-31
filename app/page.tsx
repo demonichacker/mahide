@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Sparkles, Package, Zap } from "lucide-react"
 import { motion, useScroll, useTransform } from "framer-motion"
 import Link from "next/link"
-import { collections } from "@/lib/data"
+import { products } from "@/lib/data"
 
 const whatsappNumber = "2347049146832"
 const whatsappLink = `https://wa.me/${whatsappNumber}?text=Hello%20I%20want%20to%20order%20from%20MAHIDE%20COLLECTION`
@@ -125,9 +125,9 @@ export default function HomePage() {
             transition={{ duration: 0.8, delay: 1.2 }}
           >
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link href="/collections">
+              <Link href="/shop">
                 <Button size="lg" className="text-base h-14 px-10 relative overflow-hidden group">
-                  <span className="relative z-10">View Collection</span>
+                  <span className="relative z-10">Shop Collection</span>
                   <motion.div
                     className="absolute inset-0 bg-foreground/10"
                     initial={{ x: "-100%" }}
@@ -168,37 +168,44 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* Featured Collections */}
+      {/* Featured Products */}
       <section className="py-20 px-4">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 tracking-tight">Our Collection</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {collections.map((collection) => (
-              <Link key={collection.slug} href={`/collections/${collection.slug}`}>
+          <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 tracking-tight">Featured Pieces</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {products.filter(p => p.featured).map((product) => (
+              <Link key={product.id} href={`/shop/${product.id}`}>
                 <motion.div
-                  className="group relative overflow-hidden rounded-lg aspect-[3/4] cursor-pointer"
-                  whileHover={{ scale: 1.02 }}
-                  transition={{ duration: 0.3 }}
+                  className="group relative overflow-hidden rounded-lg bg-card border border-border/50 hover:border-foreground/20 transition-all duration-300 cursor-pointer flex flex-col h-full"
+                  whileHover={{ y: -4 }}
+                  transition={{ duration: 0.2 }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent z-10" />
-                  <img
-                    src={collection.image || "/placeholder.svg"}
-                    alt={collection.name}
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="relative z-20 h-full flex flex-col justify-end p-8">
-                    <h3 className="text-3xl font-bold mb-2">{collection.name}</h3>
-                    <p className="text-muted-foreground text-sm">{collection.description}</p>
+                  <div className="relative aspect-[3/4] overflow-hidden">
+                    <img
+                      src={product.image || "/placeholder.svg"}
+                      alt={product.name}
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+                  <div className="p-6 flex flex-col flex-grow justify-between bg-card">
+                    <div>
+                      <h3 className="text-lg font-semibold tracking-tight text-balance group-hover:text-primary transition-colors">{product.name}</h3>
+                      <p className="text-muted-foreground text-sm mt-1 line-clamp-2">{product.description}</p>
+                    </div>
+                    <div className="mt-4 flex items-center justify-between">
+                      <span className="text-lg font-bold">{product.price}</span>
+                      <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground group-hover:text-foreground transition-colors">Details →</span>
+                    </div>
                   </div>
                 </motion.div>
               </Link>
             ))}
           </div>
 
-          <div className="flex justify-center mt-12">
-            <Link href="/collections">
+          <div className="flex justify-center mt-16">
+            <Link href="/shop">
               <Button size="lg" variant="outline" className="text-base h-14 px-10 bg-transparent">
-                View All Collections
+                View All Pieces
               </Button>
             </Link>
           </div>
@@ -263,47 +270,6 @@ export default function HomePage() {
           </Button>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="border-t border-border/50 py-12 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-            <div className="space-y-4">
-              <h3 className="text-2xl font-bold tracking-tight">MAHIDE COLLECTION</h3>
-              <p className="text-muted-foreground">Modern Streetwear. Timeless Confidence.</p>
-            </div>
-            <div className="space-y-4">
-              <h4 className="font-semibold">Contact</h4>
-              <Button
-                variant="outline"
-                className="w-fit bg-transparent"
-                onClick={() => window.open(whatsappLink, "_blank")}
-              >
-                WhatsApp: 07049146832
-              </Button>
-            </div>
-            <div className="space-y-4">
-              <h4 className="font-semibold">Follow Us</h4>
-              <div className="flex gap-4">
-                {/* Assuming Instagram, Facebook, Twitter icons are still used */}
-                {/* Placeholder for social media icons */}
-                {/* <button className="w-10 h-10 rounded-full bg-foreground/5 hover:bg-foreground/10 flex items-center justify-center transition-colors">
-                  <Instagram className="w-5 h-5" />
-                </button>
-                <button className="w-10 h-10 rounded-full bg-foreground/5 hover:bg-foreground/10 flex items-center justify-center transition-colors">
-                  <Facebook className="w-5 h-5" />
-                </button>
-                <button className="w-10 h-10 rounded-full bg-foreground/5 hover:bg-foreground/10 flex items-center justify-center transition-colors">
-                  <Twitter className="w-5 h-5" />
-                </button> */}
-              </div>
-            </div>
-          </div>
-          <div className="pt-8 border-t border-border/50 text-center text-sm text-muted-foreground">
-            © {new Date().getFullYear()} MAHIDE COLLECTION. All rights reserved.
-          </div>
-        </div>
-      </footer>
     </div>
   )
 }

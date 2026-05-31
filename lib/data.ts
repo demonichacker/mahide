@@ -2,162 +2,144 @@ export interface Product {
   id: string
   name: string
   price: string
-  category: string
   image: string
+  images?: string[]
+  colorImages?: Record<string, string[]>
   description: string
   sizes: string[]
   colors: string[]
   material: string
   careInstructions: string[]
+  featured?: boolean
+  availability?: "in_stock" | "out_of_stock" | "coming_soon"
 }
-
-export interface Collection {
-  slug: string
-  name: string
-  image: string
-  description: string
-}
-
-export const collections: Collection[] = [
-  {
-    slug: "men",
-    name: "Men's Collection",
-    image: "/modern-black-streetwear-men-fashion-model.jpg",
-    description: "Bold, contemporary streetwear designed for the modern man. Effortless style meets premium comfort.",
-  },
-  {
-    slug: "women",
-    name: "Women's Collection",
-    image: "/modern-black-streetwear-women-fashion-model.jpg",
-    description:
-      "Chic, confident pieces that redefine modern femininity. Elegant streetwear with a sophisticated edge.",
-  },
-]
 
 export const products: Product[] = [
   {
-    id: "leather-jacket-001",
-    name: "Premium Leather Jacket",
-    price: "₦45,000",
-    category: "men",
-    image: "/luxury-black-leather-jacket-on-white-background.jpg",
-    description:
-      "A timeless leather jacket crafted from premium Italian leather. Features a classic silhouette with modern details, perfect for elevating any casual outfit. This piece combines durability with sophisticated style.",
-    sizes: ["S", "M", "L", "XL", "XXL"],
-    colors: ["Black", "Dark Brown"],
-    material: "100% Premium Italian Leather, Polyester Lining",
-    careInstructions: [
-      "Professional leather cleaning only",
-      "Do not machine wash",
-      "Store in a cool, dry place",
-      "Use leather conditioner regularly",
-    ],
-  },
-  {
-    id: "evening-dress-001",
-    name: "Silk Evening Dress",
-    price: "₦38,000",
-    category: "women",
-    image: "/elegant-black-evening-dress-on-white-background.jpg",
-    description:
-      "An elegant silk evening dress that drapes beautifully. Features a flattering silhouette with subtle detailing. Perfect for special occasions or upscale events. The luxurious fabric feels incredible against the skin.",
-    sizes: ["XS", "S", "M", "L", "XL"],
-    colors: ["Black", "Midnight Blue"],
-    material: "100% Silk Charmeuse",
-    careInstructions: ["Dry clean only", "Do not bleach", "Iron on low heat if needed", "Store hanging"],
-  },
-  {
-    id: "blazer-001",
-    name: "Classic Blazer",
-    price: "₦32,000",
-    category: "men",
-    image: "/black-modern-blazer-on-white-background.jpg",
-    description:
-      "A modern take on the classic blazer. Tailored fit with contemporary details. Versatile enough for business meetings or evening events. Crafted from premium wool blend for comfort and durability.",
-    sizes: ["S", "M", "L", "XL", "XXL"],
-    colors: ["Black", "Charcoal Grey", "Navy"],
-    material: "70% Wool, 30% Polyester",
-    careInstructions: ["Dry clean recommended", "Can be steamed", "Store on a proper hanger", "Avoid direct sunlight"],
-  },
-  {
-    id: "cashmere-sweater-001",
-    name: "Cashmere Sweater",
-    price: "₦25,000",
-    category: "women",
-    image: "/elegant-black-cashmere-sweater-on-white-background.jpg",
-    description:
-      "Ultra-soft cashmere sweater for ultimate comfort. Classic crew neck design with a relaxed fit. Perfect for layering or wearing on its own. The premium cashmere provides warmth without bulk.",
-    sizes: ["XS", "S", "M", "L", "XL"],
-    colors: ["Black", "Cream", "Grey"],
-    material: "100% Pure Cashmere",
-    careInstructions: [
-      "Hand wash in cold water or dry clean",
-      "Lay flat to dry",
-      "Use cashmere comb to remove pilling",
-      "Store folded, not hanging",
-    ],
-  },
-  {
-    id: "trousers-001",
-    name: "Tailored Trousers",
-    price: "₦20,000",
-    category: "women",
-    image: "/black-tailored-trousers-on-white-background.jpg",
-    description:
-      "Impeccably tailored trousers with a flattering high-waisted fit. Features a classic straight leg silhouette. Perfect for office wear or casual elegance. Made from premium stretch fabric for all-day comfort.",
-    sizes: ["24", "26", "28", "30", "32", "34"],
-    colors: ["Black", "Navy", "Grey"],
-    material: "65% Polyester, 30% Viscose, 5% Elastane",
-    careInstructions: ["Machine wash cold", "Hang to dry", "Iron on medium heat", "Do not bleach"],
-  },
-  {
-    id: "hoodie-001",
-    name: "Premium Hoodie",
+    id: "two-tone-polo",
+    name: "MAHIDE Two-Tone Polo",
     price: "₦18,000",
-    category: "men",
-    image: "/black-premium-hoodie-streetwear-on-white.jpg",
+    image: "/1.jpg",
+    images: ["/1.jpg"],
     description:
-      "Essential streetwear staple crafted from premium cotton blend. Features a comfortable oversized fit with quality construction. Perfect for casual everyday wear or layering.",
+      "A premium heavyweight cotton pique polo shirt. Features a distinct sand-beige contrast collar and button placket, adorned with the signature MAHIDE monogram embroidery on the chest. Designed for a comfortable, structured unisex streetwear drape.",
     sizes: ["S", "M", "L", "XL", "XXL"],
-    colors: ["Black", "Grey", "White"],
-    material: "80% Cotton, 20% Polyester Fleece",
-    careInstructions: ["Machine wash cold", "Tumble dry low", "Do not iron print", "Wash inside out"],
+    colors: ["Black/Sand"],
+    material: "100% Premium Cotton Pique",
+    careInstructions: [
+      "Machine wash cold inside out",
+      "Hang dry to maintain garment shape",
+      "Do not iron embroidery directly",
+      "Do not bleach",
+    ],
+    featured: true,
+    availability: "in_stock",
   },
   {
-    id: "cargo-pants-001",
-    name: "Tactical Cargo Pants",
-    price: "₦22,000",
-    category: "men",
-    image: "/black-cargo-pants-streetwear-on-white.jpg",
+    id: "resilience-polo",
+    name: "MAHIDE 'Resilience' Polo",
+    price: "₦25,000",
+    image: "/2f.jpg",
+    images: ["/2f.jpg", "/2b.jpg"],
     description:
-      "Modern cargo pants with functional pockets and contemporary fit. Durable fabric with stretch for comfort and movement. Perfect for urban streetwear style.",
-    sizes: ["28", "30", "32", "34", "36", "38"],
-    colors: ["Black", "Olive", "Grey"],
-    material: "98% Cotton, 2% Elastane",
-    careInstructions: ["Machine wash cold", "Tumble dry low", "Iron if needed", "Do not bleach"],
+      "Elevate your streetwear aesthetic with this graphic-detailed polo. Featuring an ornate gold crown crest embroidery, a flowing 'Resilience' script print across the chest, and block graphic sleeve numbers. Designed to stand out.",
+    sizes: ["S", "M", "L", "XL", "XXL"],
+    colors: ["Black"],
+    material: "100% Double-knit Heavyweight Cotton",
+    careInstructions: [
+      "Hand wash cold recommended",
+      "Wash inside out",
+      "Iron on reverse side only",
+      "Do not tumble dry",
+    ],
+    featured: true,
+    availability: "in_stock",
   },
   {
-    id: "crop-top-001",
-    name: "Essential Crop Top",
-    price: "₦12,000",
-    category: "women",
-    image: "/black-crop-top-streetwear-on-white.jpg",
+    id: "cropped-camo-polo",
+    name: "MAHIDE Cropped Camo Polo",
+    price: "₦28,000",
+    image: "/3f.jpg",
+    images: ["/3f.jpg", "/3b.jpg"],
     description:
-      "Versatile crop top with a flattering fit. Made from soft, breathable fabric. Perfect for pairing with high-waisted bottoms. A wardrobe essential for modern streetwear.",
+      "A modern boxy, cropped silhouette polo shirt featuring bold camouflage applique patches. Detailed with a signature camo horse emblem, logo chest print, and vintage 'YOURNAME 44' varsity graphics on the back.",
     sizes: ["XS", "S", "M", "L", "XL"],
-    colors: ["Black", "White", "Grey"],
-    material: "95% Cotton, 5% Elastane",
-    careInstructions: ["Machine wash cold", "Hang to dry", "Low heat iron", "Do not bleach"],
+    colors: ["Black/Camo"],
+    material: "100% Organic Cotton Terry Pique",
+    careInstructions: [
+      "Machine wash cold gentle cycle",
+      "Wash with like colors",
+      "Tumble dry low",
+      "Warm iron on reverse side",
+    ],
+    featured: true,
+    availability: "in_stock",
+  },
+  {
+    id: "spiral-seal-tee",
+    name: "MAHIDE Spiral Seal Tee",
+    price: "₦10,000",
+    image: "/4f.jpg",
+    images: ["/4f.jpg", "/4b.jpg", "/6f.jpg", "/6b.jpg"],
+    colorImages: {
+      "White": ["/4f.jpg", "/4b.jpg"],
+      "Black": ["/6f.jpg", "/6b.jpg"],
+    },
+    description:
+      "A statement streetwear tee. Features a vibrant red serif logo print across the front and an intricate, gothic-inspired spiral seal design printed on the back. Cut to a relaxed, oversized unisex drape. Available in both White and Black.",
+    sizes: ["S", "M", "L", "XL", "XXL"],
+    colors: ["White", "Black"],
+    material: "100% Ultra-Heavyweight Cotton (260GSM)",
+    careInstructions: [
+      "Machine wash cold inside out",
+      "Do not bleach",
+      "Hang dry in shade to preserve print",
+      "Do not iron print",
+    ],
+    featured: true,
+    availability: "out_of_stock",
+  },
+  {
+    id: "stripe-jersey-polo",
+    name: "MAHIDE Stripe Jersey Polo",
+    price: "₦25,000",
+    image: "/5f.jpg",
+    images: ["/5f.jpg", "/5b.jpg"],
+    description:
+      "A vintage-inspired vertical striped jersey polo blending classic sports heritage with high-street design. Rendered in forest green and beige stripes, accented by a detailed eagle shield crest, chest typography, and varsity '00' prints on the front and back.",
+    sizes: ["S", "M", "L", "XL", "XXL"],
+    colors: ["Forest Green/Beige"],
+    material: "90% Cotton, 10% Recycled Polyester Ribbed Knit",
+    careInstructions: [
+      "Wash inside out with similar colors",
+      "Do not iron directly on graphics",
+      "Dry flat",
+      "Machine wash cold gentle cycle",
+    ],
+    featured: true,
+    availability: "in_stock",
+  },
+  {
+    id: "motion-jersey-polo",
+    name: "MAHIDE \"Motion\" Jersey Polo",
+    price: "₦25,000",
+    image: "/7f.jpg",
+    images: ["/7f.jpg", "/7b.jpg"],
+    description:
+      "A striking split-design jersey polo. Features a forest green and off-white half-and-half contrast body, accented by gold varsity '00' prints, a compass star, and a bold 'MOTION' block print on the back.",
+    sizes: ["S", "M", "L", "XL", "XXL"],
+    colors: ["Forest Green/Beige Split"],
+    material: "90% Cotton, 10% Recycled Polyester Ribbed Knit",
+    careInstructions: [
+      "Wash inside out with similar colors",
+      "Do not iron directly on gold graphics",
+      "Dry flat",
+      "Machine wash cold gentle cycle",
+    ],
+    featured: true,
+    availability: "coming_soon",
   },
 ]
-
-export function getCollectionBySlug(slug: string): Collection | undefined {
-  return collections.find((c) => c.slug === slug)
-}
-
-export function getProductsByCollection(collectionSlug: string): Product[] {
-  return products.filter((p) => p.category === collectionSlug)
-}
 
 export function getProductById(productId: string): Product | undefined {
   return products.find((p) => p.id === productId)
