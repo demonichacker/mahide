@@ -172,9 +172,9 @@ export default function HomePage() {
       <section className="py-20 px-4">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 tracking-tight">Featured Pieces</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
             {products.filter(p => p.featured).map((product) => (
-              <Link key={product.id} href={`/shop/${product.id}`}>
+              <Link key={product.id} href={`/shop/${product.id}`} className="w-full max-w-sm">
                 <motion.div
                   className="group relative overflow-hidden rounded-lg bg-card border border-border/50 hover:border-foreground/20 transition-all duration-300 cursor-pointer flex flex-col h-full"
                   whileHover={{ y: -4 }}

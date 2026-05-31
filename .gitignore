@@ -2,4 +2,6 @@ node_modules
 .next
 .DS_Store
 .vscode
+.env.local
+.env*.local
 
