@@ -139,6 +139,46 @@ export const products: Product[] = [
     featured: true,
     availability: "coming_soon",
   },
+  {
+    id: "elite-jersey-polo",
+    name: "MAHIDE \"Elite\" Jersey Polo",
+    price: "₦25,000",
+    image: "/8f.jpg",
+    images: ["/8f.jpg", "/8b.jpg"],
+    description:
+      "A premium heritage-inspired jersey polo featuring bold varsity graphics and signature MAHIDE branding. Crafted with precision detailing, this piece combines classic athletic aesthetics with modern streetwear sensibilities.",
+    sizes: ["S", "M", "L", "XL", "XXL"],
+    colors: ["Black"],
+    material: "90% Cotton, 10% Recycled Polyester Ribbed Knit",
+    careInstructions: [
+      "Wash inside out with similar colors",
+      "Do not iron directly on graphics",
+      "Dry flat",
+      "Machine wash cold gentle cycle",
+    ],
+    featured: true,
+    availability: "in_stock",
+  },
+  {
+    id: "heritage-jersey-polo",
+    name: "MAHIDE \"Heritage\" Jersey Polo",
+    price: "₦25,000",
+    image: "/9f.jpg",
+    images: ["/9f.jpg", "/9b.jpg"],
+    description:
+      "A classic jersey polo that honors MAHIDE's design philosophy. Features distinctive block lettering, ornate crest embroidery, and vintage-inspired varsity detailing. Perfect for those who appreciate timeless streetwear craftsmanship.",
+    sizes: ["S", "M", "L", "XL", "XXL"],
+    colors: ["Black/Cream"],
+    material: "90% Cotton, 10% Recycled Polyester Ribbed Knit",
+    careInstructions: [
+      "Wash inside out with similar colors",
+      "Do not iron directly on embroidery",
+      "Dry flat",
+      "Machine wash cold gentle cycle",
+    ],
+    featured: true,
+    availability: "in_stock",
+  },
 ]
 
 export function getProductById(productId: string): Product | undefined {
