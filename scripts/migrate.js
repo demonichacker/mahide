@@ -1,20 +1,12 @@
-export interface Product {
-  id: string
-  name: string
-  price: string
-  image: string
-  images?: string[]
-  colorImages?: Record<string, string[]>
-  description: string
-  sizes: string[]
-  colors: string[]
-  material: string
-  careInstructions: string[]
-  featured?: boolean
-  availability?: "in_stock" | "out_of_stock" | "coming_soon"
-}
+const { MongoClient } = require('mongodb')
+const dotenv = require('dotenv')
 
-export const products: Product[] = [
+dotenv.config({ path: '.env.local' })
+
+const MONGODB_URI = process.env.MONGODB_URI
+
+// Products data - copy from data.ts
+const products = [
   {
     id: "two-tone-polo",
     name: "MAHIDE Two-Tone Polo",
@@ -72,7 +64,7 @@ export const products: Product[] = [
       "Tumble dry low",
       "Warm iron on reverse side",
     ],
-    featured: false,
+    featured: true,
     availability: "in_stock",
   },
   {
@@ -181,6 +173,47 @@ export const products: Product[] = [
   },
 ]
 
-export function getProductById(productId: string): Product | undefined {
-  return products.find((p) => p.id === productId)
+if (!MONGODB_URI) {
+  console.error('❌ MONGODB_URI not found in .env.local')
+  process.exit(1)
 }
+
+async function migrateProducts() {
+  const client = new MongoClient(MONGODB_URI)
+
+  try {
+    console.log('📦 Connecting to MongoDB...')
+    await client.connect()
+    const db = client.db('mahide')
+    const collection = db.collection('products')
+
+    console.log('🗑️  Clearing existing products...')
+    await collection.deleteMany({})
+
+    console.log('📤 Inserting products into database...')
+    const result = await collection.insertMany(
+      products.map((product) => ({
+        ...product,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }))
+    )
+
+    console.log(`✅ Successfully migrated ${result.insertedCount} products!`)
+    console.log('\n📊 Products added:')
+    products.forEach((p) => {
+      console.log(`  • ${p.name} (${p.id}) - ${p.availability}`)
+    })
+
+    console.log('\n🎉 Migration complete! Your admin panel is ready to use.')
+    console.log('Visit http://localhost:3000/admin to manage products.')
+  } catch (error) {
+    console.error('❌ Migration failed:', error)
+    process.exit(1)
+  } finally {
+    await client.close()
+  }
+}
+
+migrateProducts()
+

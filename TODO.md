@@ -2,4 +2,4 @@
 
 - [x] Install pnpm globally using npm
 - [x] Install dependencies using pnpm install
-- [ ] Run the development server using pnpm dev
+- [x] Run the development server using pnpm dev

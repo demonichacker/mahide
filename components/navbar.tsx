@@ -1,14 +1,15 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, X } from "lucide-react"
+import { Menu, X, Sun, Moon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { useTheme } from "next-themes"
 
 const navLinks = [
   { name: "Home", href: "/" },
-  { name: "Collections", href: "/collections" },
+  { name: "Shop", href: "/shop" },
   { name: "About", href: "/#about" },
   { name: "Contact", href: "/#contact" },
 ]
@@ -16,6 +17,11 @@ const navLinks = [
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const pathname = usePathname()
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  // Avoid hydration mismatch — only render the icon after mount
+  useEffect(() => setMounted(true), [])
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50">
@@ -42,10 +48,32 @@ export function Navbar() {
             ))}
           </div>
 
-          {/* Mobile Menu Button */}
-          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </Button>
+          {/* Right side: Theme Toggle + Mobile Menu */}
+          <div className="flex items-center gap-2">
+            {/* Theme Toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="relative w-9 h-9 rounded-full"
+              aria-label="Toggle theme"
+            >
+              {mounted ? (
+                theme === "dark" ? (
+                  <Sun className="h-4 w-4 transition-all" />
+                ) : (
+                  <Moon className="h-4 w-4 transition-all" />
+                )
+              ) : (
+                <span className="h-4 w-4" />
+              )}
+            </Button>
+
+            {/* Mobile Menu Button */}
+            <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </Button>
+          </div>
         </div>
       </div>
 

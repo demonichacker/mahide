@@ -1,20 +1,10 @@
-export interface Product {
-  id: string
-  name: string
-  price: string
-  image: string
-  images?: string[]
-  colorImages?: Record<string, string[]>
-  description: string
-  sizes: string[]
-  colors: string[]
-  material: string
-  careInstructions: string[]
-  featured?: boolean
-  availability?: "in_stock" | "out_of_stock" | "coming_soon"
-}
+import { NextRequest, NextResponse } from 'next/server'
+import { getProductsCollection } from '@/lib/mongodb'
 
-export const products: Product[] = [
+const SEED_TOKEN = process.env.SEED_TOKEN || 'seed-mahide-2026'
+
+// Initial products data
+const initialProducts = [
   {
     id: "two-tone-polo",
     name: "MAHIDE Two-Tone Polo",
@@ -72,7 +62,7 @@ export const products: Product[] = [
       "Tumble dry low",
       "Warm iron on reverse side",
     ],
-    featured: false,
+    featured: true,
     availability: "in_stock",
   },
   {
@@ -181,6 +171,42 @@ export const products: Product[] = [
   },
 ]
 
-export function getProductById(productId: string): Product | undefined {
-  return products.find((p) => p.id === productId)
+export async function POST(request: NextRequest) {
+  try {
+    const { token } = await request.json()
+
+    // Validate seed token
+    if (token !== SEED_TOKEN) {
+      return NextResponse.json(
+        { error: 'Invalid seed token' },
+        { status: 401 }
+      )
+    }
+
+    const collection = await getProductsCollection()
+
+    // Clear existing products
+    await collection.deleteMany({})
+
+    // Insert initial products
+    const result = await collection.insertMany(
+      initialProducts.map((product) => ({
+        ...product,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }))
+    )
+
+    return NextResponse.json({
+      success: true,
+      message: `Successfully seeded ${result.insertedCount} products`,
+      count: result.insertedCount,
+    })
+  } catch (error) {
+    console.error('Error seeding products:', error)
+    return NextResponse.json(
+      { error: 'Failed to seed products' },
+      { status: 500 }
+    )
+  }
 }
