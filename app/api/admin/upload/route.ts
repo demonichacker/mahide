@@ -24,9 +24,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
-    if (!allowedTypes.includes(file.type)) {
+    // Validate file type (allow images and audio)
+    const allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+    const allowedAudioTypes = ['audio/mpeg', 'audio/mp3', 'audio/mp4', 'audio/x-m4a']
+    const isImage = allowedImageTypes.includes(file.type)
+    const isAudio = allowedAudioTypes.includes(file.type) || file.type.startsWith('audio/')
+    if (!isImage && !isAudio) {
       return NextResponse.json(
         { error: 'Invalid file type. Only JPEG, PNG, WebP, and GIF are allowed.' },
         { status: 400 }
@@ -46,8 +49,8 @@ export async function POST(request: NextRequest) {
     const fileExtension = file.name.split('.').pop()
     const filename = `${timestamp}.${fileExtension}`
 
-    // Save to public folder
-    const publicDir = join(process.cwd(), 'public', 'uploads')
+    // Save to public folder (images -> /uploads, audio -> /audio)
+    const publicDir = isAudio ? join(process.cwd(), 'public', 'audio') : join(process.cwd(), 'public', 'uploads')
     
     // Ensure uploads directory exists
     if (!existsSync(publicDir)) {
@@ -59,7 +62,7 @@ export async function POST(request: NextRequest) {
     await writeFile(filepath, Buffer.from(buffer))
 
     // Return the public URL
-    const publicUrl = `/uploads/${filename}`
+    const publicUrl = isAudio ? `/audio/${filename}` : `/uploads/${filename}`
 
     return NextResponse.json({
       success: true,
