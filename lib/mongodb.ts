@@ -28,3 +28,13 @@ export async function getProductsCollection() {
   const { db } = await connectToDatabase()
   return db.collection('products')
 }
+
+export async function getSettingsCollection() {
+  const { db } = await connectToDatabase()
+  return db.collection('settings')
+}
+
+export async function getWaitlistCollection() {
+  const { db } = await connectToDatabase()
+  return db.collection('waitlist')
+}

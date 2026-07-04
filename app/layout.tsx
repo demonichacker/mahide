@@ -7,6 +7,8 @@ import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { PageFadeIn } from "@/components/page-fade-in"
 import { ThemeProvider } from "@/components/theme-provider"
+import { CartProvider } from "@/context/cart-context"
+import { MahideLoader } from "@/components/mahide-loader"
 
 const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
@@ -30,18 +32,21 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`font-sans antialiased`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem={false}
-        >
-          <Navbar />
-          <main className="pt-16">
-            <PageFadeIn>{children}</PageFadeIn>
-          </main>
-          <Footer />
-          <Analytics />
-        </ThemeProvider>
+        <CartProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem={false}
+          >
+            <MahideLoader />
+            <Navbar />
+            <main className="pt-16">
+              <PageFadeIn>{children}</PageFadeIn>
+            </main>
+            <Footer />
+            <Analytics />
+          </ThemeProvider>
+        </CartProvider>
       </body>
     </html>
   )

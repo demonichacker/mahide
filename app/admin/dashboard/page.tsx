@@ -27,6 +27,8 @@ interface Product {
 export default function AdminDashboard() {
   const [products, setProducts] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [settings, setSettings] = useState<any>(null)
+  const [savingSettings, setSavingSettings] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const router = useRouter()
@@ -34,7 +36,19 @@ export default function AdminDashboard() {
   useEffect(() => {
     checkAuth()
     fetchProducts()
+    fetchSettings()
   }, [])
+
+  const fetchSettings = async () => {
+    try {
+      const res = await fetch('/api/admin/settings')
+      if (res.status === 401) return
+      const data = await res.json()
+      setSettings(data)
+    } catch (err) {
+      console.error('Failed to load settings', err)
+    }
+  }
 
   const checkAuth = async () => {
     try {
@@ -143,6 +157,96 @@ export default function AdminDashboard() {
 
         {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Settings Card */}
+          <div className="lg:col-span-1">
+            <Card className="p-6 mb-4">
+              <h3 className="text-lg font-semibold mb-3">Site Settings</h3>
+              {settings ? (
+                <div className="space-y-3">
+                  <label className="flex items-center justify-between gap-3">
+                    <span className="text-sm">Waitlist Active</span>
+                    <input
+                      type="checkbox"
+                      checked={!!settings.active}
+                      onChange={(e) => setSettings((s:any)=>({...s, active: e.target.checked}))}
+                    />
+                  </label>
+
+                  <label className="block text-sm">
+                    Bypass Password
+                    <input
+                      type="text"
+                      value={settings.bypassPassword || ''}
+                      onChange={(e)=>setSettings((s:any)=>({...s, bypassPassword: e.target.value}))}
+                      className="w-full mt-1 p-2 rounded border bg-input"
+                    />
+                  </label>
+
+                  <label className="block text-sm">
+                    Countdown Target (ISO)
+                    <input
+                      type="datetime-local"
+                      value={settings.countdownTarget ? new Date(settings.countdownTarget).toISOString().slice(0,16) : ''}
+                      onChange={(e)=>setSettings((s:any)=>({...s, countdownTarget: new Date(e.target.value).toISOString()}))}
+                      className="w-full mt-1 p-2 rounded border bg-input"
+                    />
+                  </label>
+
+                  <label className="block text-sm">
+                    Background Audio
+                    <div className="flex gap-2 mt-1">
+                      <input type="file" accept="audio/*" id="audioUpload" className="" />
+                      <button
+                        className="px-3 py-2 bg-foreground text-background rounded"
+                        onClick={async ()=>{
+                          const input: any = document.getElementById('audioUpload')
+                          if (!input || !input.files || input.files.length===0) return alert('Select an audio file')
+                          const file = input.files[0]
+                          const fd = new FormData()
+                          fd.append('file', file)
+                          const up = await fetch('/api/admin/upload', {method:'POST', body: fd})
+                          const data = await up.json()
+                          if (!data || !data.url) return alert('Upload failed')
+                          setSettings((s:any)=>({...s, audioPath: data.url}))
+                          alert('Uploaded and set audio')
+                        }}
+                      >Upload</button>
+                    </div>
+                    {settings.audioPath && <div className="text-xs text-muted-foreground mt-1">Current: {settings.audioPath}</div>}
+                  </label>
+
+                  <div className="flex gap-2">
+                    <button
+                      disabled={savingSettings}
+                      onClick={async ()=>{
+                        try{
+                          setSavingSettings(true)
+                          const res = await fetch('/api/admin/settings', {
+                            method: 'PUT',
+                            headers: {'Content-Type':'application/json'},
+                            body: JSON.stringify({
+                              active: settings.active,
+                              bypassPassword: settings.bypassPassword,
+                              countdownTarget: settings.countdownTarget,
+                              audioPath: settings.audioPath,
+                            })
+                          })
+                          const d = await res.json()
+                          if (!res.ok) throw new Error(d.error||'Save failed')
+                          alert('Settings saved')
+                        }catch(err:any){
+                          alert(err.message||'Failed')
+                        }finally{setSavingSettings(false)}
+                      }}
+                      className="px-3 py-2 bg-primary text-white rounded"
+                    >Save Settings</button>
+                  </div>
+                </div>
+              ) : (
+                <p>Loading settings...</p>
+              )}
+            </Card>
+          </div>
           {/* Form Section */}
           <div className="lg:col-span-1">
             {showForm && (
