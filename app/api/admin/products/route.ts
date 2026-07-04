@@ -17,7 +17,12 @@ export async function GET(request: NextRequest) {
     const collection = await getProductsCollection()
     const products = await collection.find({}).toArray()
 
-    return NextResponse.json(products)
+    const serializedProducts = products.map((p) => ({
+      ...p,
+      _id: p._id?.toString?.() ?? p._id,
+    }))
+
+    return NextResponse.json(serializedProducts)
   } catch (error) {
     console.error('Error fetching products:', error)
     return NextResponse.json(
@@ -74,9 +79,11 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { id, ...updateData } = body
+    const { _id, ...updateData } = body
 
-    if (!id) {
+
+
+    if (!_id) {
       return NextResponse.json(
         { error: 'Product ID is required' },
         { status: 400 }
@@ -84,16 +91,19 @@ export async function PUT(request: NextRequest) {
     }
 
     const collection = await getProductsCollection()
-    
-    // Validate ObjectId format
-    let query: any = {}
-    try {
-      query = { _id: new ObjectId(id) }
-    } catch {
-      // If invalid ObjectId, try searching by id field instead
-      query = { id: id }
-    }
-    
+
+    // Product records use string `id` in the admin UI, but Mongo `_id` is typically an ObjectId.
+    // We support both safely: if `_id` is a valid ObjectId string, query by `_id`.
+    // Otherwise, fall back to querying by the document `id` field.
+    const query = (() => {
+      try {
+        return { _id: new ObjectId(_id) }
+      } catch {
+        return { id: _id }
+      }
+    })()
+
+
     const result = await collection.updateOne(
       query,
       {
@@ -103,6 +113,8 @@ export async function PUT(request: NextRequest) {
         },
       }
     )
+
+
 
     if (result.matchedCount === 0) {
       return NextResponse.json(
@@ -144,15 +156,15 @@ export async function DELETE(request: NextRequest) {
 
     const collection = await getProductsCollection()
     
-    // Validate ObjectId format
-    let query: any = {}
-    try {
-      query = { _id: new ObjectId(id) }
-    } catch {
-      // If invalid ObjectId, try searching by id field instead
-      query = { id: id }
-    }
-    
+    // Support deleting by Mongo `_id` (ObjectId string) or by the document `id` field.
+    const query = (() => {
+      try {
+        return { _id: new ObjectId(id) }
+      } catch {
+        return { id }
+      }
+    })()
+
     const result = await collection.deleteOne(query)
 
     if (result.deletedCount === 0) {
