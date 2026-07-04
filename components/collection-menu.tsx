@@ -4,12 +4,12 @@ import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 
 const collections = [
-  { name: "Long Sleeves", href: "/shop" },
-  { name: "T-Shirts", href: "/shop" },
-  { name: "Hoodies", href: "/shop" },
-  { name: "Pants", href: "/shop" },
-  { name: "Accessories", href: "/shop" },
-  { name: "View All", href: "/shop" },
+  { name: "Long Sleeves", category: "long-sleeves" },
+  { name: "T-Shirts", category: "t-shirts" },
+  { name: "Hoodies", category: "hoodies" },
+  { name: "Pants", category: "pants" },
+  { name: "Accessories", category: "accessories" },
+  { name: "View All", category: null },
 ]
 
 interface CollectionMenuProps {
@@ -48,7 +48,7 @@ export function CollectionMenu({ isOpen, onClose }: CollectionMenuProps) {
                   transition={{ duration: 0.3, delay: index * 0.05 }}
                 >
                   <Link
-                    href={collection.href}
+                    href={`/shop${collection.category ? `?category=${collection.category}` : ""}`}
                     onClick={onClose}
                     className="text-xs uppercase tracking-[0.15em] text-white/70 hover:text-white transition-colors relative group"
                   >

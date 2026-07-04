@@ -5,6 +5,7 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import { BackgroundSlideshow } from "@/components/background-slideshow"
 import { BackgroundAudio } from "@/components/background-audio"
+import { useSearchParams } from "next/navigation"
 
 const availabilityBadge = (availability?: string) => {
   if (availability === "out_of_stock") {
@@ -24,7 +25,22 @@ const availabilityBadge = (availability?: string) => {
   return null
 }
 
+const categories = [
+  { name: "Long Sleeves", value: "long-sleeves" },
+  { name: "T-Shirts", value: "t-shirts" },
+  { name: "Hoodies", value: "hoodies" },
+  { name: "Pants", value: "pants" },
+  { name: "Accessories", value: "accessories" },
+]
+
 export default function ShopPage() {
+  const searchParams = useSearchParams()
+  const activeCategory = searchParams.get("category")
+
+  const filteredProducts = activeCategory
+    ? products.filter((p) => p.category === activeCategory)
+    : products
+
   return (
     <div className="relative min-h-screen w-full overflow-hidden">
       {/* Cinematic Background Slideshow */}
@@ -53,11 +69,40 @@ export default function ShopPage() {
         </motion.p>
       </section>
 
+      {/* Category Filter */}
+      <section className="relative z-20 pb-8 px-4">
+        <div className="max-w-7xl mx-auto flex flex-wrap justify-center gap-4">
+          <Link
+            href="/shop"
+            className={`text-xs uppercase tracking-widest px-4 py-2 border transition-all duration-300 ${
+              !activeCategory
+                ? "border-white text-white bg-white/10"
+                : "border-white/30 text-white/60 hover:border-white hover:text-white"
+            }`}
+          >
+            View All
+          </Link>
+          {categories.map((category) => (
+            <Link
+              key={category.value}
+              href={`/shop?category=${category.value}`}
+              className={`text-xs uppercase tracking-widest px-4 py-2 border transition-all duration-300 ${
+                activeCategory === category.value
+                  ? "border-white text-white bg-white/10"
+                  : "border-white/30 text-white/60 hover:border-white hover:text-white"
+              }`}
+            >
+              {category.name}
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* Products Grid - Floating Items */}
       <section className="relative z-10 px-4 pb-32">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-16">
-            {products.map((product, index) => (
+            {filteredProducts.map((product, index) => (
               <motion.div
                 key={product.id}
                 initial={{ opacity: 0, y: 50 }}

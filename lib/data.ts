@@ -10,6 +10,7 @@ export interface Product {
   colors: string[]
   material: string
   careInstructions: string[]
+  category?: "t-shirts" | "long-sleeves" | "hoodies" | "pants" | "accessories"
   featured?: boolean
   availability?: "in_stock" | "out_of_stock" | "coming_soon"
 }
@@ -32,6 +33,7 @@ export const products: Product[] = [
       "Do not iron embroidery directly",
       "Do not bleach",
     ],
+    category: "t-shirts",
     featured: true,
     availability: "in_stock",
   },
@@ -52,6 +54,7 @@ export const products: Product[] = [
       "Iron on reverse side only",
       "Do not tumble dry",
     ],
+    category: "t-shirts",
     featured: true,
     availability: "in_stock",
   },
@@ -72,6 +75,7 @@ export const products: Product[] = [
       "Tumble dry low",
       "Warm iron on reverse side",
     ],
+    category: "t-shirts",
     featured: false,
     availability: "in_stock",
   },
@@ -96,6 +100,7 @@ export const products: Product[] = [
       "Hang dry in shade to preserve print",
       "Do not iron print",
     ],
+    category: "t-shirts",
     featured: true,
     availability: "out_of_stock",
   },
@@ -116,6 +121,7 @@ export const products: Product[] = [
       "Dry flat",
       "Machine wash cold gentle cycle",
     ],
+    category: "t-shirts",
     featured: false,
     availability: "in_stock",
   },
@@ -136,6 +142,7 @@ export const products: Product[] = [
       "Dry flat",
       "Machine wash cold gentle cycle",
     ],
+    category: "t-shirts",
     featured: false,
     availability: "coming_soon",
   },
@@ -156,6 +163,7 @@ export const products: Product[] = [
       "Dry flat",
       "Machine wash cold gentle cycle",
     ],
+    category: "t-shirts",
     featured: false,
     availability: "coming_soon",
   },
@@ -176,6 +184,7 @@ export const products: Product[] = [
       "Dry flat",
       "Machine wash cold gentle cycle",
     ],
+    category: "t-shirts",
     featured: false,
     availability: "coming_soon",
   },
