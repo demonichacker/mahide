@@ -129,7 +129,7 @@ const products = [
       "Machine wash cold gentle cycle",
     ],
     featured: false,
-    availability: "coming_soon",
+    availability: "in_stock",
   },
   {
     id: "elite-jersey-polo",
@@ -149,7 +149,7 @@ const products = [
       "Machine wash cold gentle cycle",
     ],
     featured: false,
-    availability: "coming_soon",
+    availability: "in_stock",
   },
   {
     id: "heritage-jersey-polo",
@@ -169,7 +169,27 @@ const products = [
       "Machine wash cold gentle cycle",
     ],
     featured: false,
-    availability: "coming_soon",
+    availability: "in_stock",
+  },
+  {
+    id: "lion-flag-tee",
+    name: "MAHIDE Lion Flag Tee",
+    price: "₦20,000",
+    image: "/10F.jpg",
+    images: ["/10F.jpg"],
+    description:
+      "Make a bold statement with the MAHIDE Lion Flag Tee. Features a striking crimson flag graphic built from repeating MAHIDE stripe text, a rampant lion crest at the canton, and a silver star border framing the entire design. Finished with a bold 'MAHIDE' wordmark beneath — heritage and streetwear in one.",
+    sizes: ["S", "M", "L", "XL", "XXL"],
+    colors: ["Black"],
+    material: "100% Ultra-Heavyweight Cotton",
+    careInstructions: [
+      "Machine wash cold inside out",
+      "Do not bleach",
+      "Hang dry in shade to preserve print",
+      "Do not iron directly on graphics",
+    ],
+    featured: true,
+    availability: "in_stock",
   },
 ]
 

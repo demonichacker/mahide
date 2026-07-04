@@ -2,6 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSettingsCollection, getWaitlistCollection } from '@/lib/mongodb'
 
 export async function GET() {
+  // If MONGODB_URI is not set, return safe defaults so the app works without a DB
+  if (!process.env.MONGODB_URI) {
+    return NextResponse.json({
+      waitlistActive: false,
+      countdownTarget: null,
+      audioPath: '/bg_track.mp3',
+    })
+  }
+
   try {
     const settingsCollection = await getSettingsCollection()
     const waitlistSettings = await settingsCollection.findOne({ _id: 'waitlist' as any })
