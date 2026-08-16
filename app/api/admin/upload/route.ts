@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { isAdminAuthenticated } from '@/lib/admin-auth'
 import { writeFile, mkdir } from 'fs/promises'
-import { join } from 'path'
 import { existsSync } from 'fs'
 
 export async function POST(request: NextRequest) {
@@ -46,18 +45,20 @@ export async function POST(request: NextRequest) {
 
     // Generate filename with timestamp
     const timestamp = Date.now()
-    const fileExtension = file.name.split('.').pop()
+    const fileExtension = file.name.split('.').pop() || 'png'
     const filename = `${timestamp}.${fileExtension}`
 
-    // Save to public folder (images -> /uploads, audio -> /audio)
-    const publicDir = isAudio ? join(process.cwd(), 'public', 'audio') : join(process.cwd(), 'public', 'uploads')
-    
-    // Ensure uploads directory exists
-    if (!existsSync(publicDir)) {
-      await mkdir(publicDir, { recursive: true })
+    // Use /tmp for Vercel serverless execution to prevent bundling giant public dir
+    const isVercel = process.env.VERCEL === '1'
+    const targetDir = isVercel
+      ? '/tmp'
+      : `${process.cwd()}/public/${isAudio ? 'audio' : 'uploads'}`
+
+    if (!existsSync(targetDir)) {
+      await mkdir(targetDir, { recursive: true })
     }
 
-    const filepath = join(publicDir, filename)
+    const filepath = `${targetDir}/${filename}`
     const buffer = await file.arrayBuffer()
     await writeFile(filepath, Buffer.from(buffer))
 
