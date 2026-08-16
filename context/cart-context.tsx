@@ -20,6 +20,7 @@ interface CartContextType {
   clearCart: () => void
   cartCount: number
   cartTotal: string
+  cartTotalAmount: number
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
@@ -58,10 +59,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }
 
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0)
-  const cartTotal = items.length > 0 ? `₦${items.length * 25000}` : "₦0"
+  const cartTotalKobo = items.reduce((sum, item) => {
+    const numericPrice = parseInt(item.price.replace(/[^\d]/g, ""), 10) || 0
+    return sum + numericPrice * item.quantity
+  }, 0)
+  const cartTotal = `₦${cartTotalKobo.toLocaleString("en-NG")}`
+  const cartTotalAmount = cartTotalKobo * 100 // kobo for Paystack
 
   return (
-    <CartContext.Provider value={{ items, addToCart, removeFromCart, updateQuantity, clearCart, cartCount, cartTotal }}>
+    <CartContext.Provider value={{ items, addToCart, removeFromCart, updateQuantity, clearCart, cartCount, cartTotal, cartTotalAmount }}>
       {children}
     </CartContext.Provider>
   )

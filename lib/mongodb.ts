@@ -37,3 +37,8 @@ export async function getWaitlistCollection() {
   const { db } = await connectToDatabase()
   return db.collection('waitlist')
 }
+
+export async function getOrdersCollection() {
+  const { db } = await connectToDatabase()
+  return db.collection('orders')
+}

@@ -8,8 +8,6 @@ import { motion } from "framer-motion"
 import { Check, ArrowLeft, ShoppingBag } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { BackgroundSlideshow } from "@/components/background-slideshow"
-import { BackgroundAudio } from "@/components/background-audio"
 import { useCart } from "@/context/cart-context"
 import { toast } from "sonner"
 
@@ -43,15 +41,28 @@ export default function ProductDetailPage({ params }: { params: Promise<Params> 
       ? activeImage
       : displayImages[0] || product.image
 
+  const [showSizeError, setShowSizeError] = useState(false)
+  const [showColorError, setShowColorError] = useState(false)
+
   const handleAddToCart = async () => {
+    let hasError = false
     if (product.sizes && product.sizes.length > 0 && !selectedSize) {
-      toast.error("Please select a size")
-      return
+      setShowSizeError(true)
+      toast.error("Please select a size before adding to cart")
+      hasError = true
+    } else {
+      setShowSizeError(false)
     }
+
     if (product.colors && product.colors.length > 0 && !selectedColor) {
-      toast.error("Please select a color")
-      return
+      setShowColorError(true)
+      toast.error("Please select a color before adding to cart")
+      hasError = true
+    } else {
+      setShowColorError(false)
     }
+
+    if (hasError) return
 
     setIsAdding(true)
     try {
@@ -74,24 +85,19 @@ export default function ProductDetailPage({ params }: { params: Promise<Params> 
   }
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden text-white">
-      {/* Cinematic Background Slideshow */}
-      <BackgroundSlideshow />
-
-      {/* Background Audio */}
-      <BackgroundAudio />
+    <div className="relative min-h-screen w-full bg-white text-black">
 
       {/* Back Button */}
-      <Link href="/shop" className="relative z-30 absolute top-20 left-6 flex items-center gap-2 text-white hover:opacity-70 transition-opacity">
+      <Link href="/shop" className="absolute top-20 left-6 z-30 flex items-center gap-2 text-black hover:opacity-60 transition-opacity">
         <ArrowLeft className="w-4 h-4" />
         <span className="text-sm font-semibold uppercase tracking-widest">Back to Shop</span>
       </Link>
 
       {/* Product Detail Section */}
-      <section className="relative z-10 py-16 px-4 pt-32">
+      <section className="py-16 px-4 pt-32">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Product Image - Floating */}
+            {/* Product Image */}
             <motion.div
               className="space-y-6 flex flex-col items-center"
               initial={{ opacity: 0, x: -30 }}
@@ -104,9 +110,9 @@ export default function ProductDetailPage({ params }: { params: Promise<Params> 
                   key={currentImage}
                   src={currentImage}
                   alt={product.name}
-                  className="h-full w-auto object-contain drop-shadow-2xl"
+                  className="h-full w-auto object-contain"
                   style={{
-                    filter: "drop-shadow(0 25px 35px rgba(0, 0, 0, 0.6))",
+                    filter: "drop-shadow(0 15px 30px rgba(0, 0, 0, 0.15))",
                   }}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -121,10 +127,10 @@ export default function ProductDetailPage({ params }: { params: Promise<Params> 
                     <button
                       key={idx}
                       onClick={() => setActiveImage(img)}
-                      className={`relative w-16 h-16 rounded overflow-hidden border-2 transition-all ${
+                      className={`relative w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
                         currentImage === img
-                          ? "border-white opacity-100"
-                          : "border-white/30 opacity-60 hover:opacity-100"
+                          ? "border-black opacity-100"
+                          : "border-neutral-200 opacity-60 hover:opacity-100"
                       }`}
                     >
                       <img
@@ -146,24 +152,34 @@ export default function ProductDetailPage({ params }: { params: Promise<Params> 
               transition={{ duration: 0.6, delay: 0.2 }}
             >
               <div className="space-y-4">
-                <h1 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tighter">{product.name}</h1>
-                <p className="text-3xl font-bold">{product.price}</p>
-                <p className="text-neutral-300 leading-relaxed text-lg max-w-lg">{product.description}</p>
+                <h1 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tighter text-black">{product.name}</h1>
+                <p className="text-3xl font-bold text-black">{product.price}</p>
+                <p className="text-neutral-600 leading-relaxed text-lg max-w-lg">{product.description}</p>
               </div>
 
               {/* Size Selection */}
               {product.sizes && product.sizes.length > 0 && (
                 <div className="space-y-4">
-                  <h3 className="text-sm font-bold uppercase tracking-widest">Select Size</h3>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-bold uppercase tracking-widest text-black">Select Size</h3>
+                    {showSizeError && !selectedSize && (
+                      <span className="text-xs font-bold text-red-600 animate-pulse">! Please pick a size</span>
+                    )}
+                  </div>
                   <div className="flex flex-wrap gap-2">
                     {product.sizes.map((size) => (
                       <button
                         key={size}
-                        onClick={() => setSelectedSize(size)}
+                        onClick={() => {
+                          setSelectedSize(size)
+                          setShowSizeError(false)
+                        }}
                         className={`px-6 py-3 border rounded text-sm font-bold uppercase tracking-wider transition-all ${
                           selectedSize === size
-                            ? "bg-white text-black border-white"
-                            : "bg-transparent border-white/40 text-white hover:border-white"
+                            ? "bg-black text-white border-black"
+                            : showSizeError
+                            ? "bg-red-50 border-red-500 text-red-700 hover:border-black"
+                            : "bg-transparent border-neutral-300 text-black hover:border-black"
                         }`}
                       >
                         {size}
@@ -176,16 +192,26 @@ export default function ProductDetailPage({ params }: { params: Promise<Params> 
               {/* Color Selection */}
               {product.colors && product.colors.length > 0 && (
                 <div className="space-y-4">
-                  <h3 className="text-sm font-bold uppercase tracking-widest">Select Color</h3>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-bold uppercase tracking-widest text-black">Select Color</h3>
+                    {showColorError && !selectedColor && (
+                      <span className="text-xs font-bold text-red-600 animate-pulse">! Please pick a color</span>
+                    )}
+                  </div>
                   <div className="flex flex-wrap gap-2">
                     {product.colors.map((color) => (
                       <button
                         key={color}
-                        onClick={() => setSelectedColor(color)}
+                        onClick={() => {
+                          setSelectedColor(color)
+                          setShowColorError(false)
+                        }}
                         className={`px-6 py-3 border rounded text-sm font-bold uppercase tracking-wider transition-all ${
                           selectedColor === color
-                            ? "bg-white text-black border-white"
-                            : "bg-transparent border-white/40 text-white hover:border-white"
+                            ? "bg-black text-white border-black"
+                            : showColorError
+                            ? "bg-red-50 border-red-500 text-red-700 hover:border-black"
+                            : "bg-transparent border-neutral-300 text-black hover:border-black"
                         }`}
                       >
                         {color}
@@ -197,33 +223,33 @@ export default function ProductDetailPage({ params }: { params: Promise<Params> 
 
               {/* Availability Banner */}
               {product.availability === "out_of_stock" && (
-                <div className="flex items-center gap-3 px-4 py-3 rounded bg-red-600/20 border border-red-500/50">
+                <div className="flex items-center gap-3 px-4 py-3 rounded bg-red-50 border border-red-200">
                   <span className="w-2 h-2 rounded-full bg-red-400 flex-shrink-0" />
-                  <p className="text-sm font-bold text-red-300 uppercase tracking-wider">Out of Stock</p>
+                  <p className="text-sm font-bold text-red-600 uppercase tracking-wider">Out of Stock</p>
                 </div>
               )}
               {product.availability === "coming_soon" && (
-                <div className="flex items-center gap-3 px-4 py-3 rounded bg-white/10 border border-white/30">
-                  <span className="w-2 h-2 rounded-full bg-white flex-shrink-0 animate-pulse" />
-                  <p className="text-sm font-bold text-white/70 uppercase tracking-wider">Coming Soon</p>
+                <div className="flex items-center gap-3 px-4 py-3 rounded bg-neutral-100 border border-neutral-200">
+                  <span className="w-2 h-2 rounded-full bg-neutral-400 flex-shrink-0 animate-pulse" />
+                  <p className="text-sm font-bold text-neutral-600 uppercase tracking-wider">Coming Soon</p>
                 </div>
               )}
 
               {/* Quantity Selector */}
               {product.availability !== "out_of_stock" && product.availability !== "coming_soon" && (
                 <div className="space-y-2">
-                  <h3 className="text-sm font-bold uppercase tracking-widest">Quantity</h3>
-                  <div className="flex items-center gap-4 border border-white/20 w-fit px-4 py-3 rounded">
+                  <h3 className="text-sm font-bold uppercase tracking-widest text-black">Quantity</h3>
+                  <div className="flex items-center gap-4 border border-neutral-200 w-fit px-4 py-3 rounded">
                     <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="text-white/60 hover:text-white transition-colors font-bold"
+                      className="text-neutral-400 hover:text-black transition-colors font-bold"
                     >
                       −
                     </button>
-                    <span className="text-white font-bold w-6 text-center">{quantity}</span>
+                    <span className="text-black font-bold w-6 text-center">{quantity}</span>
                     <button
                       onClick={() => setQuantity(quantity + 1)}
-                      className="text-white/60 hover:text-white transition-colors font-bold"
+                      className="text-neutral-400 hover:text-black transition-colors font-bold"
                     >
                       +
                     </button>
@@ -234,7 +260,7 @@ export default function ProductDetailPage({ params }: { params: Promise<Params> 
               {/* Add to Cart Button */}
               <Button
                 size="lg"
-                className="w-full h-14 text-base font-bold uppercase tracking-wider bg-white text-black hover:bg-neutral-200 transition-colors flex items-center justify-center gap-2"
+                className="w-full h-14 text-base font-bold uppercase tracking-wider bg-black text-white hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2"
                 onClick={handleAddToCart}
                 disabled={product.availability === "out_of_stock" || product.availability === "coming_soon" || isAdding}
               >
@@ -247,36 +273,47 @@ export default function ProductDetailPage({ params }: { params: Promise<Params> 
               </Button>
 
               {/* Product Details */}
-              <div className="space-y-6 border-t border-white/20 pt-8">
+              <div className="space-y-6 border-t border-neutral-200 pt-8">
                 <div className="space-y-2">
-                  <h3 className="text-sm font-bold uppercase tracking-widest">Material</h3>
-                  <p className="text-neutral-300">{product.material}</p>
+                  <h3 className="text-sm font-bold uppercase tracking-widest text-black">Material</h3>
+                  <p className="text-neutral-600">{product.material}</p>
                 </div>
 
                 {product.careInstructions && product.careInstructions.length > 0 && (
-                  <div className="space-y-3">
-                    <h3 className="text-sm font-bold uppercase tracking-widest">Care Instructions</h3>
+                  <div className="space-y-3 border-b border-neutral-100 pb-6">
+                    <h3 className="text-sm font-bold uppercase tracking-widest text-black">Care Instructions</h3>
                     <ul className="space-y-2">
                       {product.careInstructions.map((instruction, index) => (
-                        <li key={index} className="flex items-start gap-2 text-neutral-300">
-                          <Check className="w-4 h-4 mt-0.5 flex-shrink-0 text-emerald-400" />
+                        <li key={index} className="flex items-start gap-2 text-neutral-600">
+                          <Check className="w-4 h-4 mt-0.5 flex-shrink-0 text-emerald-500" />
                           <span className="text-sm">{instruction}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
                 )}
+
+                {/* Delivery Information Accordion */}
+                <div className="border border-neutral-200 rounded-lg p-5 space-y-3 bg-neutral-50/50">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-black uppercase tracking-wider text-black">Delivery Information</h3>
+                    <span className="text-xs text-neutral-400 font-semibold">Shipping Policy</span>
+                  </div>
+                  <ul className="space-y-2 text-xs md:text-sm font-medium text-neutral-700 leading-relaxed uppercase tracking-wide">
+                    <li>- READY TO SHIP.</li>
+                    <li>- FOR DOMESTIC ORDERS, 5-7 BUSINESS DAYS AFTER ORDER PROCESSING.</li>
+                    <li>- FOR INTERNATIONAL ORDERS, 7-15 BUSINESS DAYS AFTER ORDER PROCESSING.</li>
+                    <li>- NOTE THAT IMPORT DUTIES MAY APPLY FOR CUSTOMERS IN CERTAIN REGIONS.</li>
+                    <li className="pt-2 text-neutral-900 font-bold border-t border-neutral-200">
+                      - FOR MORE INFO, KINDLY REFER TO OUR SHIPPING POLICY
+                    </li>
+                  </ul>
+                </div>
               </div>
             </motion.div>
           </div>
         </div>
       </section>
-
-      {/* Dark gradient overlay at bottom */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{ background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%)" }}
-      />
     </div>
   )
 }

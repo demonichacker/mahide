@@ -1,14 +1,16 @@
 "use client"
-import { useState } from "react"
+
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, X, Grid3x3, ShoppingBag } from "lucide-react"
+import { Menu, X, Grid3x3, ShoppingBag, ArrowUpRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { CollectionMenu } from "./collection-menu"
 import { useCart } from "@/context/cart-context"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 
 const navLinks = [
+  { name: "Home", href: "/" },
   { name: "Shop", href: "/shop" },
   { name: "About", href: "/about" },
   { name: "Contact", href: "/contact" },
@@ -17,118 +19,166 @@ const navLinks = [
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [collectionMenuOpen, setCollectionMenuOpen] = useState(false)
+  const [isIsland, setIsIsland] = useState(false)
   const pathname = usePathname()
   const { cartCount } = useCart()
+  const lastScrollY = useRef(0)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY
+      // When scrolled down > 40px, transform into Dynamic Island
+      if (currentScrollY > 40) {
+        setIsIsland(true)
+      } else {
+        setIsIsland(false)
+      }
+      lastScrollY.current = currentScrollY
+    }
+
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* Left: Logo */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.95 }}
-              transition={{ duration: 0.8 }}
-            >
-              <Link href="/" className="text-xl font-black tracking-tighter text-white hover:opacity-80 transition-opacity">
-                MAHIDE
-              </Link>
-            </motion.div>
-
-            {/* Center: Empty (Minimalist) */}
-            <div className="hidden md:block" />
-
-            {/* Right: Collection & Cart Buttons + Mobile Menu */}
-            <div className="flex items-center gap-3 md:gap-4">
-              {/* Drops Label - Desktop Only */}
-              <motion.div
-                className="hidden md:block text-[10px] font-bold uppercase tracking-[0.2em] text-white/50"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.8, delay: 0.3 }}
-              >
-                Drops
-              </motion.div>
-
-              {/* Collection Button - Desktop */}
-              <motion.button
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-                onClick={() => setCollectionMenuOpen(!collectionMenuOpen)}
-                className="hidden md:flex w-12 h-12 items-center justify-center border border-white/30 hover:border-white/60 text-white/60 hover:text-white transition-all duration-300 hover:scale-105"
-              >
-                <Grid3x3 className="w-5 h-5" strokeWidth={1.5} />
-              </motion.button>
-
-              {/* Cart Button - Desktop */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, delay: 0.3 }}
-              >
-                <Link href="/cart">
-                  <button className="hidden md:flex relative w-12 h-12 items-center justify-center border border-white/30 hover:border-white/60 text-white/60 hover:text-white transition-all duration-300 hover:scale-105">
-                    <ShoppingBag className="w-5 h-5" strokeWidth={1.5} />
-                    {cartCount > 0 && (
-                      <span className="absolute -top-2 -right-2 w-5 h-5 bg-white text-black text-xs font-bold rounded-full flex items-center justify-center">
-                        {cartCount}
-                      </span>
-                    )}
-                  </button>
-                </Link>
-              </motion.div>
-
-              {/* Mobile Menu Button */}
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden text-white hover:opacity-80 transition-opacity"
-              >
-                {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <motion.div
-            className="md:hidden bg-black/40 backdrop-blur-md border-b border-white/10"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
+      <header className="fixed top-0 left-0 right-0 z-50 flex justify-center pointer-events-none p-0 sm:p-2">
+        <motion.nav
+          layout
+          transition={{ type: "spring", stiffness: 320, damping: 28 }}
+          className={cn(
+            "pointer-events-auto transition-all duration-500 flex items-center justify-between",
+            isIsland
+              ? "w-[92%] sm:w-auto min-w-[320px] sm:min-w-[480px] md:min-w-[580px] h-12 md:h-14 px-5 md:px-7 rounded-full bg-black/90 backdrop-blur-xl border border-white/20 shadow-2xl text-white mt-2"
+              : "w-full max-w-full h-16 px-6 sm:px-8 lg:px-12 rounded-none bg-black text-white border-b border-white/10"
+          )}
+        >
+          {/* Logo */}
+          <Link
+            href="/"
+            className="flex items-center gap-2 font-black tracking-tighter hover:opacity-80 transition-opacity"
           >
-            <div className="px-4 pt-2 pb-4 space-y-2">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={cn(
-                    "block px-3 py-3 rounded text-sm font-semibold uppercase tracking-widest transition-colors",
-                    pathname === link.href
-                      ? "bg-white/10 text-white"
-                      : "text-white/60 hover:bg-white/5 hover:text-white",
-                  )}
-                >
-                  {link.name}
-                </Link>
-              ))}
+            <span className={cn(
+              "font-black tracking-tighter transition-all text-white",
+              isIsland ? "text-base md:text-lg" : "text-xl md:text-2xl"
+            )}>
+              MAHIDE
+            </span>
+            {isIsland && (
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse ml-0.5" />
+            )}
+          </Link>
 
-              {/* Mobile Cart Link */}
+          {/* Center Links (Home, Shop, About, Contact) */}
+          <div className="hidden md:flex items-center gap-6 lg:gap-8">
+            {navLinks.map((link) => (
               <Link
-                href="/cart"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-between px-3 py-3 rounded text-sm font-semibold uppercase tracking-widest text-white/60 hover:bg-white/5 hover:text-white transition-colors"
+                key={link.href}
+                href={link.href}
+                className={cn(
+                  "text-xs font-extrabold uppercase tracking-widest transition-colors text-white",
+                  pathname === link.href ? "opacity-100 underline underline-offset-4" : "opacity-75 hover:opacity-100"
+                )}
               >
-                <span>Cart</span>
-                {cartCount > 0 && <span className="bg-white text-black text-xs px-2 py-0.5 rounded-full">{cartCount}</span>}
+                {link.name}
               </Link>
-            </div>
-          </motion.div>
-        )}
-      </nav>
+            ))}
+          </div>
+
+          {/* Right Action Icons */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Collection Grid Button */}
+            <button
+              onClick={() => setCollectionMenuOpen(!collectionMenuOpen)}
+              className={cn(
+                "flex items-center justify-center transition-all duration-300 hover:scale-105 text-white",
+                isIsland
+                  ? "w-8 h-8 rounded-full bg-white/10 hover:bg-white/20"
+                  : "w-10 h-10 border border-white/30 hover:border-white"
+              )}
+              title="Browse Collections"
+            >
+              <Grid3x3 className="w-4 h-4" strokeWidth={1.75} />
+            </button>
+
+            {/* Cart Button */}
+            <Link href="/cart">
+              <button
+                className={cn(
+                  "relative flex items-center justify-center transition-all duration-300 hover:scale-105",
+                  isIsland
+                    ? "w-8 h-8 rounded-full bg-white text-black"
+                    : "w-10 h-10 border border-white/30 hover:border-white text-white"
+                )}
+                title="Bag"
+              >
+                <ShoppingBag className="w-4 h-4" strokeWidth={2} />
+                {cartCount > 0 && (
+                  <span className={cn(
+                    "absolute -top-1.5 -right-1.5 text-[10px] font-extrabold rounded-full flex items-center justify-center min-w-[18px] h-[18px] px-1",
+                    isIsland ? "bg-red-500 text-white" : "bg-white text-black"
+                  )}>
+                    {cartCount}
+                  </span>
+                )}
+              </button>
+            </Link>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden flex items-center justify-center p-1 text-white transition-opacity"
+            >
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
+        </motion.nav>
+
+        {/* Mobile Menu Modal */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              className="absolute top-16 left-4 right-4 bg-black/95 backdrop-blur-2xl border border-white/10 rounded-2xl p-5 shadow-2xl text-white pointer-events-auto md:hidden"
+              initial={{ opacity: 0, scale: 0.95, y: -10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: -10 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div className="space-y-3">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={cn(
+                      "flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-colors",
+                      pathname === link.href
+                        ? "bg-white/15 text-white"
+                        : "text-white/60 hover:bg-white/5 hover:text-white"
+                    )}
+                  >
+                    <span>{link.name}</span>
+                    <ArrowUpRight className="w-4 h-4 text-white/40" />
+                  </Link>
+                ))}
+
+                <Link
+                  href="/cart"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-widest text-white/60 hover:bg-white/5 hover:text-white transition-colors"
+                >
+                  <span>Your Bag</span>
+                  {cartCount > 0 && (
+                    <span className="bg-white text-black text-xs font-extrabold px-2 py-0.5 rounded-full">
+                      {cartCount}
+                    </span>
+                  )}
+                </Link>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </header>
 
       {/* Collection Menu Overlay */}
       <CollectionMenu isOpen={collectionMenuOpen} onClose={() => setCollectionMenuOpen(false)} />
