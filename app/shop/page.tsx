@@ -14,6 +14,112 @@ const categories = [
   { id: "accessories", label: "Accessories", comingSoon: true },
 ]
 
+const colorStyleMap: Record<string, { bg: string; border?: string }> = {
+  Green: { bg: "bg-emerald-700" },
+  Red: { bg: "bg-red-700" },
+  Black: { bg: "bg-black" },
+  White: { bg: "bg-white", border: "border border-neutral-300" },
+  "Black/Sand": { bg: "bg-neutral-900" },
+  "Black/Camo": { bg: "bg-neutral-800" },
+  "Forest Green/Beige": { bg: "bg-emerald-900" },
+}
+
+function ProductCard({ product, index }: { product: any; index: number }) {
+  const [selectedColor, setSelectedColor] = useState<string>(
+    product.colors && product.colors.length > 0 ? product.colors[0] : ""
+  )
+
+  const currentImage =
+    selectedColor && product.colorImages && product.colorImages[selectedColor]?.[0]
+      ? product.colorImages[selectedColor][0]
+      : product.image
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: index * 0.08 }}
+      className="flex flex-col items-center group cursor-pointer w-64 md:w-72"
+    >
+      {/* Product Image */}
+      <Link href={`/shop/${product.id}`}>
+        <div className="relative h-80 md:h-[420px] lg:h-[480px] w-full flex items-center justify-center mb-6 group-hover:scale-105 transition-transform duration-500">
+          <img
+            src={currentImage || "/placeholder.svg"}
+            alt={product.name}
+            className="h-full w-auto object-contain opacity-100 transition-opacity duration-300"
+            style={{
+              filter: "drop-shadow(0 8px 20px rgba(0, 0, 0, 0.12))",
+            }}
+          />
+        </div>
+      </Link>
+
+      {/* Product Info */}
+      <div className="text-center w-full space-y-2">
+        <Link href={`/shop/${product.id}`}>
+          <h3 className="text-sm md:text-base font-bold uppercase tracking-widest text-black group-hover:text-neutral-500 transition-colors">
+            {product.name}
+          </h3>
+        </Link>
+
+        <p className="text-lg md:text-xl font-bold text-black">
+          {product.price}
+        </p>
+
+        {/* Color Circles */}
+        {product.colors && product.colors.length > 0 && (
+          <div className="flex items-center justify-center gap-2 pt-1">
+            {product.colors.map((color: string) => {
+              const style = colorStyleMap[color] || { bg: "bg-neutral-400" }
+              const isSelected = selectedColor === color
+
+              return (
+                <button
+                  key={color}
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    setSelectedColor(color)
+                  }}
+                  onMouseEnter={() => setSelectedColor(color)}
+                  className={`w-4 h-4 rounded-full transition-all duration-200 ${style.bg} ${
+                    style.border || ""
+                  } ${
+                    isSelected
+                      ? "ring-2 ring-black ring-offset-2 scale-110"
+                      : "hover:scale-110 opacity-70 hover:opacity-100"
+                  }`}
+                  title={`${color} option`}
+                />
+              )
+            })}
+            {product.colors.length > 1 && (
+              <span className="text-[10px] font-semibold text-neutral-400 uppercase tracking-wider ml-1">
+                {product.colors.length} colors
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Status */}
+        <div className="pt-1">
+          <span className="text-xs font-semibold uppercase tracking-wider text-emerald-600">
+            In Stock
+          </span>
+        </div>
+
+        {/* View Button */}
+        <Link href={`/shop/${product.id}`}>
+          <button className="mt-3 text-xs uppercase font-bold tracking-widest text-black border border-black/30 px-6 py-2 hover:bg-black hover:text-white transition-all duration-300 group-hover:border-black">
+            View Details
+          </button>
+        </Link>
+      </div>
+    </motion.div>
+  )
+}
+
 export default function ShopPage() {
   const [selectedCategory, setSelectedCategory] = useState("all")
 
@@ -96,54 +202,7 @@ export default function ShopPage() {
               {products
                 .filter((p) => p.availability !== "out_of_stock")
                 .map((product, index) => (
-                  <motion.div
-                    key={product.id}
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: index * 0.08 }}
-                    className="flex flex-col items-center group cursor-pointer w-64 md:w-72"
-                  >
-                    {/* Product Image */}
-                    <Link href={`/shop/${product.id}`}>
-                      <div className="relative h-80 md:h-[420px] lg:h-[480px] w-full flex items-center justify-center mb-6 group-hover:scale-105 transition-transform duration-500">
-                        <img
-                          src={product.image || "/placeholder.svg"}
-                          alt={product.name}
-                          className="h-full w-auto object-contain opacity-100 transition-opacity duration-300"
-                          style={{
-                            filter: "drop-shadow(0 8px 20px rgba(0, 0, 0, 0.12))",
-                          }}
-                        />
-                      </div>
-                    </Link>
-
-                    {/* Product Info */}
-                    <div className="text-center w-full">
-                      <Link href={`/shop/${product.id}`}>
-                        <h3 className="text-sm md:text-base font-bold uppercase tracking-widest text-black group-hover:text-neutral-500 transition-colors">
-                          {product.name}
-                        </h3>
-                      </Link>
-
-                      <p className="text-lg md:text-xl font-bold text-black mt-2">
-                        {product.price}
-                      </p>
-
-                      {/* Status */}
-                      <div className="mt-3">
-                        <span className="text-xs font-semibold uppercase tracking-wider text-emerald-600">
-                          In Stock
-                        </span>
-                      </div>
-
-                      {/* View Button */}
-                      <Link href={`/shop/${product.id}`}>
-                        <button className="mt-4 text-xs uppercase font-bold tracking-widest text-black border border-black/30 px-6 py-2 hover:bg-black hover:text-white transition-all duration-300 group-hover:border-black">
-                          View Details
-                        </button>
-                      </Link>
-                    </div>
-                  </motion.div>
+                  <ProductCard key={product.id} product={product} index={index} />
                 ))}
             </div>
           )}

@@ -6,6 +6,7 @@ import Link from "next/link"
 import { ShoppingBag, Plus, Minus, X as XIcon, ArrowLeft, Truck } from "lucide-react"
 import { useState, useEffect } from "react"
 import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 import Script from "next/script"
 
 const PAYSTACK_KEY = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || ""
@@ -37,7 +38,7 @@ function CheckoutButton({
   form: DeliveryForm
   subtotalKobo: number // in naira
   items: any[]
-  onSuccess: () => void
+  onSuccess: (ref: string) => void
   onClose: () => void
   disabled: boolean
 }) {
@@ -120,12 +121,13 @@ function CheckoutButton({
         ],
       },
       callback: function (response: any) {
+        const finalRef = response.reference || reference
         // Save order details to backend API for admin fulfillment
         fetch("/api/orders", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            reference: response.reference || reference,
+            reference: finalRef,
             fullName: form.fullName,
             phone: form.phone,
             email: form.email,
@@ -145,7 +147,7 @@ function CheckoutButton({
           }),
         }).catch((err) => console.error("Error saving order:", err))
 
-        onSuccess()
+        onSuccess(finalRef)
       },
       onClose: function () {
         onClose()
@@ -174,6 +176,7 @@ function CheckoutButton({
 
 export default function CartPage() {
   const { items, removeFromCart, updateQuantity, cartTotalAmount, clearCart } = useCart()
+  const router = useRouter()
   const [form, setForm] = useState<DeliveryForm>({
     fullName: "",
     phone: "",
@@ -186,13 +189,13 @@ export default function CartPage() {
   const deliveryFee = form.location === "lagos" ? 5000 : form.location === "outside_lagos" ? 10000 : 0
   const grandTotalNaira = subtotalNaira + deliveryFee
 
-  const handleSuccess = () => {
-    toast.success("🎉 Payment successful! Your order has been placed. Check your email for details.")
+  const handleSuccess = (ref: string) => {
     clearCart()
+    router.push(`/checkout/success?ref=${encodeURIComponent(ref)}&email=${encodeURIComponent(form.email)}&name=${encodeURIComponent(form.fullName)}`)
   }
 
   const handleClose = () => {
-    toast("Payment window closed. Your cart and delivery info are still saved.")
+    toast.error("Payment was cancelled or closed.")
   }
 
   return (
