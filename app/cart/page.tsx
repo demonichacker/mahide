@@ -1,9 +1,9 @@
 "use client"
 
-import { useCart } from "@/context/cart-context"
+import { useCart, getItemKey } from "@/context/cart-context"
 import { motion } from "framer-motion"
 import Link from "next/link"
-import { ShoppingBag, Plus, Minus, X as XIcon, ArrowLeft, Truck } from "lucide-react"
+import { ShoppingBag, Plus, Minus, Trash2, ArrowLeft, Truck } from "lucide-react"
 import { useState, useEffect } from "react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
@@ -245,75 +245,101 @@ export default function CartPage() {
             >
               {/* Cart Items & Delivery Info Left Column */}
               <div className="lg:col-span-2 space-y-10">
-                <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-black">Your Bag</h1>
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-4">
+                  <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-black">Your Bag</h1>
+                  {items.length > 0 && (
+                    <button
+                      onClick={() => {
+                        clearCart()
+                        toast.success("Bag cleared")
+                      }}
+                      className="text-xs font-bold uppercase tracking-wider text-red-500 hover:text-red-700 transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-100 hover:border-red-200 bg-red-50/50"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      Clear Bag
+                    </button>
+                  )}
+                </div>
 
                 {/* Items list */}
                 <div className="space-y-4">
-                  {items.map((item, index) => (
-                    <motion.div
-                      key={`${item.id}-${item.color}-${item.size}`}
-                      className="border border-neutral-100 p-5 rounded-lg flex flex-col sm:flex-row gap-5 bg-white shadow-sm"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4, delay: index * 0.08 }}
-                    >
-                      {/* Product Image */}
-                      <div className="w-full sm:w-28 h-28 flex items-center justify-center bg-neutral-50 rounded-lg overflow-hidden flex-shrink-0">
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="w-full h-full object-contain p-2"
-                        />
-                      </div>
+                  {items.map((item, index) => {
+                    const itemKey = getItemKey(item)
 
-                      {/* Product Info */}
-                      <div className="flex-1 flex flex-col justify-between">
-                        <div>
-                          <h3 className="text-base font-bold uppercase tracking-wider text-black mb-1">
-                            {item.name}
-                          </h3>
-                          <div className="space-y-0.5 text-sm text-neutral-500">
-                            {item.color && <p>Color: <span className="font-semibold text-black">{item.color}</span></p>}
-                            {item.size && <p>Size: <span className="font-semibold text-black">{item.size}</span></p>}
+                    return (
+                      <motion.div
+                        key={itemKey}
+                        className="border border-neutral-100 p-5 rounded-lg flex flex-col sm:flex-row gap-5 bg-white shadow-sm hover:border-neutral-200 transition-colors"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: index * 0.08 }}
+                      >
+                        {/* Product Image */}
+                        <div className="w-full sm:w-28 h-28 flex items-center justify-center bg-neutral-50 rounded-lg overflow-hidden flex-shrink-0">
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="w-full h-full object-contain p-2"
+                          />
+                        </div>
+
+                        {/* Product Info */}
+                        <div className="flex-1 flex flex-col justify-between space-y-3">
+                          <div>
+                            <h3 className="text-base font-bold uppercase tracking-wider text-black mb-1">
+                              {item.name}
+                            </h3>
+                            <div className="space-y-0.5 text-sm text-neutral-500">
+                              {item.color && <p>Color: <span className="font-semibold text-black">{item.color}</span></p>}
+                              {item.size && <p>Size: <span className="font-semibold text-black">{item.size}</span></p>}
+                            </div>
+                          </div>
+
+                          {/* Quantity & Delete Button */}
+                          <div className="flex items-center justify-between pt-1">
+                            <div className="flex items-center gap-3 border border-neutral-200 rounded-lg px-3 py-1.5 bg-neutral-50">
+                              <button
+                                onClick={() => updateQuantity(itemKey, item.quantity - 1)}
+                                className="text-neutral-500 hover:text-black transition-colors p-0.5"
+                                title="Decrease quantity"
+                              >
+                                <Minus className="w-3.5 h-3.5" />
+                              </button>
+                              <span className="text-black font-extrabold text-sm w-5 text-center">{item.quantity}</span>
+                              <button
+                                onClick={() => updateQuantity(itemKey, item.quantity + 1)}
+                                className="text-neutral-500 hover:text-black transition-colors p-0.5"
+                                title="Increase quantity"
+                              >
+                                <Plus className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+
+                            {/* Delete Button */}
+                            <button
+                              onClick={() => {
+                                removeFromCart(itemKey)
+                                toast.success(`Removed ${item.name} from bag`)
+                              }}
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 border border-red-200/60 text-xs font-bold uppercase tracking-wider transition-all duration-200"
+                              title="Delete item from cart"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              <span>Delete</span>
+                            </button>
                           </div>
                         </div>
 
-                        {/* Quantity & Remove */}
-                        <div className="flex items-center justify-between pt-3">
-                          <div className="flex items-center gap-3 border border-neutral-200 rounded px-3 py-2">
-                            <button
-                              onClick={() => updateQuantity(`${item.id}-${item.color}-${item.size}`, item.quantity - 1)}
-                              className="text-neutral-400 hover:text-black transition-colors"
-                            >
-                              <Minus className="w-4 h-4" />
-                            </button>
-                            <span className="text-black font-semibold w-6 text-center">{item.quantity}</span>
-                            <button
-                              onClick={() => updateQuantity(`${item.id}-${item.color}-${item.size}`, item.quantity + 1)}
-                              className="text-neutral-400 hover:text-black transition-colors"
-                            >
-                              <Plus className="w-4 h-4" />
-                            </button>
-                          </div>
-
-                          <button
-                            onClick={() => removeFromCart(`${item.id}-${item.color}-${item.size}`)}
-                            className="text-neutral-300 hover:text-red-500 transition-colors"
-                          >
-                            <XIcon className="w-5 h-5" />
-                          </button>
+                        {/* Price */}
+                        <div className="text-right flex-shrink-0">
+                          <p className="text-lg font-bold text-black">{item.price}</p>
+                          {item.quantity > 1 && (
+                            <p className="text-xs text-neutral-400 mt-1">× {item.quantity}</p>
+                          )}
                         </div>
-                      </div>
-
-                      {/* Price */}
-                      <div className="text-right flex-shrink-0">
-                        <p className="text-lg font-bold text-black">{item.price}</p>
-                        {item.quantity > 1 && (
-                          <p className="text-xs text-neutral-400 mt-1">× {item.quantity}</p>
-                        )}
-                      </div>
-                    </motion.div>
-                  ))}
+                      </motion.div>
+                    )
+                  })}
                 </div>
 
                 {/* Delivery Information Form */}
