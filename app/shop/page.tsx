@@ -47,11 +47,18 @@ function ProductCard({ product, index }: { product: any; index: number }) {
           <img
             src={currentImage || "/placeholder.svg"}
             alt={product.name}
-            className="h-full w-auto object-contain opacity-100 transition-opacity duration-300"
+            className={`h-full w-auto object-contain transition-opacity duration-300 ${
+              product.availability === "out_of_stock" ? "opacity-60" : "opacity-100"
+            }`}
             style={{
               filter: "drop-shadow(0 8px 20px rgba(0, 0, 0, 0.12))",
             }}
           />
+          {product.availability === "out_of_stock" && (
+            <div className="absolute top-4 right-4 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-md">
+              Out of Stock
+            </div>
+          )}
         </div>
       </Link>
 
@@ -104,15 +111,25 @@ function ProductCard({ product, index }: { product: any; index: number }) {
 
         {/* Status */}
         <div className="pt-1">
-          <span className="text-xs font-semibold uppercase tracking-wider text-emerald-600">
-            In Stock
-          </span>
+          {product.availability === "out_of_stock" ? (
+            <span className="text-xs font-semibold uppercase tracking-wider text-red-500 font-bold">
+              Out of Stock
+            </span>
+          ) : product.availability === "coming_soon" ? (
+            <span className="text-xs font-semibold uppercase tracking-wider text-amber-500 font-bold">
+              Coming Soon
+            </span>
+          ) : (
+            <span className="text-xs font-semibold uppercase tracking-wider text-emerald-600">
+              In Stock
+            </span>
+          )}
         </div>
 
         {/* View Button */}
         <Link href={`/shop/${product.id}`}>
           <button className="mt-3 text-xs uppercase font-bold tracking-widest text-black border border-black/30 px-6 py-2 hover:bg-black hover:text-white transition-all duration-300 group-hover:border-black">
-            View Details
+            {product.availability === "out_of_stock" ? "Out of Stock" : "View Details"}
           </button>
         </Link>
       </div>
@@ -199,11 +216,9 @@ export default function ShopPage() {
           ) : (
             /* Products list */
             <div className="flex flex-wrap justify-center gap-12 md:gap-16">
-              {products
-                .filter((p) => p.availability !== "out_of_stock")
-                .map((product, index) => (
-                  <ProductCard key={product.id} product={product} index={index} />
-                ))}
+              {products.map((product, index) => (
+                <ProductCard key={product.id} product={product} index={index} />
+              ))}
             </div>
           )}
         </div>
